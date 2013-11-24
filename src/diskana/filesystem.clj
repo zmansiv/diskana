@@ -5,16 +5,24 @@
 (defrecord File [name size dir?])
 (defrecord Tree [value children])
 
+(declare build-tree)
+
+(defn parallel-map [f coll]
+  (if (> (count coll) 3)
+    ;(reduce concat (pmap #(map f %) (partition-all 3 coll)))
+    (pmap f coll)
+    (map f coll)))
+
 (defn build-tree [file]
   (let [file (if (string? file) (java.io.File. file) file)
         name (.getName file)
         dir? (.isDirectory file)
         children (.listFiles file)
-        sub-trees (map build-tree children)]
+        sub-trees (parallel-map build-tree children)]
     (Tree.
       (File.
         name
-        (if dir? (reduce + (map #(:size (:value %)) sub-trees)) (.length file))
+        (if dir? (reduce + (parallel-map #(:size (:value %)) sub-trees)) (.length file))
         dir?)
       sub-trees)))
 

@@ -46,4 +46,5 @@
 
 (defn -main [& args]
   ;(javafx.application.Application/launch com.diskana.Diskana (into-array String []))
-  (print-tree (build-tree (System/getProperty "user.dir"))))
+  (print-tree (build-tree (str (System/getProperty "user.dir"))))
+  (shutdown-agents))
